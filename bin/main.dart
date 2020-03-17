@@ -38,13 +38,13 @@ printNode(Node currentNode){
   print('rightNode=${currentNode.rightNode.data}');
 }
 bool isRightNodeNumeric(currentNode){
-  return isNumeric(currentNode.rightNode.data);
+  return (currentNode.rightNode.data=='+'||currentNode.rightNode.data=='*'||currentNode.rightNode.data=='-'||currentNode.rightNode.data=='/')? false:true;
 }
 bool isLeftNodeNumeric(currentNode){
-  return isNumeric(currentNode.leftNode.data);
+  return (currentNode.leftNode.data=='+'||currentNode.leftNode.data=='*'||currentNode.leftNode.data=='-'||currentNode.leftNode.data=='/')? false:true;
 }
 bool isCurrentNodeNumeric(currentNode){
-  return isNumeric(currentNode.data);
+  return (currentNode.data=='+'||currentNode.data=='*'||currentNode.data=='-'||currentNode.data=='/')? false:true;
 }
 Node moveLeft(currentNode){
   return currentNode.leftNode;
@@ -78,9 +78,9 @@ createTree1(){
   return node1;
 }
 createTree2(){
-  Node node1=Node('/');
+  Node node1=Node('-');
   Node node2=Node('+');
-  Node node3=Node('+');
+  Node node3=Node('/');
   Node node4=Node('6');
   Node node5=Node('2');
   Node node6=Node('4');
@@ -99,34 +99,41 @@ createTree2(){
   node7.parentNode=node3;
   return node1;
 }
- performOperation(Node currentNode){
-  print("performing operation");
-  printNode(currentNode);
-  if(currentNode.data=='+'){
-    currentNode.data=(int.parse(currentNode.leftNode.data)+int.parse(currentNode.rightNode.data)).toString();
-    print(currentNode.data);
-  }
-  else if(currentNode.data=='-'){
-    currentNode.data=(int.parse(currentNode.leftNode.data)-int.parse(currentNode.rightNode.data)).toString();
-    print(currentNode.data);
-  }
-  else if(currentNode.data=='*'){
-    currentNode.data=((int.parse(currentNode.leftNode.data))*(int.parse(currentNode.rightNode.data))).toString();
-    print("data after calculation=${currentNode.data}");
-  }
-  else if(currentNode.data=='/'){
-    currentNode.data=(int.parse(currentNode.leftNode.data)/int.parse(currentNode.rightNode.data)).floor().toString();
-    print(currentNode.data);
-  }
+add(currentNode){
+  //currentNode.data=(int.parse(currentNode.leftNode.data)+int.parse(currentNode.rightNode.data)).toString();
+  currentNode.data=(double.parse(currentNode.leftNode.data)+double.parse(currentNode.rightNode.data)).toString();
+  print(currentNode.data);
   return currentNode;
 }
-traverseTree(Node currentNode){
+subtract(currentNode){
+ // currentNode.data=(int.parse(currentNode.leftNode.data)-int.parse(currentNode.rightNode.data)).toString();
+  currentNode.data=(double.parse(currentNode.leftNode.data)-double.parse(currentNode.rightNode.data)).toString();
+  print(currentNode.data);
+  return currentNode;
+}
+multiply(currentNode){
+ // currentNode.data=(int.parse(currentNode.leftNode.data)*int.parse(currentNode.rightNode.data)).toString();
+ currentNode.data=(double.parse(currentNode.leftNode.data)*double.parse(currentNode.rightNode.data)).toString();
+  print(currentNode.data);
+  return currentNode;
+}
+divide(currentNode){
+ // currentNode.data=(int.parse(currentNode.leftNode.data)/int.parse(currentNode.rightNode.data)).toString();
+ currentNode.data=(double.parse(currentNode.leftNode.data)/double.parse(currentNode.rightNode.data)).toStringAsFixed(2);
+  print(currentNode.data);
+  return currentNode;
+}
+
+ Node performOperation(Node currentNode,callback){
+  return callback(currentNode);
+}
+Node traverseTree(Node currentNode){
   while(!isLeftNodeNumeric(currentNode)){
     currentNode=moveLeft(currentNode);
   }
   while(!isRightNodeNumeric(currentNode)){
     currentNode=moveRight(currentNode);
-     traverseTree(currentNode);
+     currentNode=traverseTree(currentNode);
   }
   return currentNode;
 }
@@ -139,14 +146,34 @@ String solveTree(Node currentNode){
   }
   else{
      currentNode=traverseTree(currentNode);
-     currentNode=performOperation(currentNode);
+     switch(currentNode.data){
+       case '+':{
+         currentNode=performOperation(currentNode, add);
+         break;
+       }
+       case '-':{
+         currentNode=performOperation(currentNode, subtract);
+         break;
+       }
+       case '*':{
+         currentNode=performOperation(currentNode, multiply);
+         break;
+       }
+       case '/':{
+         currentNode=performOperation(currentNode,divide);
+         break;
+       }
+     }
+
      currentNode=moveUp(currentNode);
-     solveTree(root);
+     return solveTree(root);
   }
+
 }
 void main() {
   Node root=createTree1();
   print(solveTree(root));
   root=createTree2();
-  print(solveTree(root));
+ print(solveTree(root));
+ return;
 }
